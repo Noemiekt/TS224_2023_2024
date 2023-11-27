@@ -12,7 +12,7 @@ halfWindow = floor(windowSize / 2);
 segmentLength = 256;
 overlap = 128;
 dirac = zeros(1,N);
-dirac(500) = 1;
+dirac(1) = 1;
 
 correlogramme = zeros(1,N);
 
@@ -23,10 +23,10 @@ correlogramme = zeros(1,N);
 autocorrelation_theorique = sigma2 * dirac;
 
 % Estimateur 1 : Fonction d'autocorrélation empirique
-autocorrelation_estimee1 = xcorr(b, 'biased');
+[autocorrelation_estimee1, lags] = xcorr(b, 'biased');
 
 % Estimateur 2 : Fonction d'autocorrélation biaisée
-autocorrelation_estimee2 = xcorr(b, 'unbiased');
+[autocorrelation_estimee2, lags2] = xcorr(b, 'unbiased');
 
 % Estimateur 3 : Fonction d'autocorrélation sans biais (biais retiré)
 autocorrelation_estimee3 = xcorr(b, 'coeff');
@@ -76,13 +76,8 @@ Pxx_Welch = [Pxx_Welch(N/2+1:end); Pxx_Welch(1:N/2)];
 
 
 % Calcul de l'auto-corrélation pour différents décalages
-for tau = 0:N-1
-    sum = 0;
-    for t = 1:N-tau
-        sum = sum + b(t) * b(t + tau);
-    end
-    correlogramme(tau + 1) = sum / (N - tau); 
-end
+auto_correlation = xcorr(b, 'biased');
+correlogramme = auto_correlation(N:end);
 
 
 %% Affichage
@@ -92,20 +87,23 @@ figure;
 % Fonction d'autocorrélation théorique
 subplot(3,1,1);
 plot(autocorrelation_theorique);
+xlim([-1000 1000]);
 title('Fonction d''autocorrélation théorique');
 xlabel('Décalage \tau'); 
 ylabel('Autocorrélation');
 
 % Fonction d'autocorrélation estimée (biaisée)
 subplot(3,1,2);
-plot(autocorrelation_estimee1);
+plot(lags, autocorrelation_estimee1);
+
 title('Fonction d''autocorrélation estimée (biaisée)');
 xlabel('Décalage \tau'); 
 ylabel('Autocorrélation'); 
 
 % Fonction d'autocorrélation estimée (sans biais)
 subplot(3,1,3);
-plot(autocorrelation_estimee2);
+plot(lags2, autocorrelation_estimee2);
+
 title('Fonction d''autocorrélation estimée (non biaisée)');
 xlabel('Décalage \tau');
 ylabel('Autocorrélation');
