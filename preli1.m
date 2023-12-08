@@ -3,6 +3,8 @@ clear; close all; clc;
 
 %% Initialisation
 
+signal_data = load("fcno03fz.mat");
+
 sigma2 = 4;
 N = 1000;
 b = randn(N,1)*sigma2;
